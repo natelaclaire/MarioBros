@@ -21,10 +21,14 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.natelaclaire.mariobros.Items.Item;
+import com.natelaclaire.mariobros.Items.ItemDef;
+import com.natelaclaire.mariobros.Items.Mushroom;
 import com.natelaclaire.mariobros.MarioBros;
 import com.natelaclaire.mariobros.Scenes.Hud;
 import com.natelaclaire.mariobros.Sprites.Enemy;
@@ -32,6 +36,9 @@ import com.natelaclaire.mariobros.Sprites.Goomba;
 import com.natelaclaire.mariobros.Sprites.Mario;
 import com.natelaclaire.mariobros.Tools.B2WorldCreator;
 import com.natelaclaire.mariobros.Tools.WorldContactListener;
+
+import java.util.PriorityQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class PlayScreen implements Screen {
     private MarioBros game;
@@ -51,6 +58,8 @@ public class PlayScreen implements Screen {
 
     private Music music;
     private B2WorldCreator creator;
+    private Array<Item> items;
+    private LinkedBlockingQueue<ItemDef> itemsToSpawn;
 
     public PlayScreen(MarioBros game) {
         atlas = new TextureAtlas("Mario_and_Enemies.pack");
@@ -77,6 +86,22 @@ public class PlayScreen implements Screen {
         music = MarioBros.manager.get("audio/music/mario_music.ogg", Music.class);
         music.setLooping(true);
         music.play();
+
+        items = new Array<Item>();
+        itemsToSpawn = new LinkedBlockingQueue<ItemDef>();
+    }
+
+    public void spawnItem(ItemDef itemDef) {
+        itemsToSpawn.add(itemDef);
+    }
+
+    public void handleSpawningItems() {
+        if (!itemsToSpawn.isEmpty()) {
+            ItemDef itemDef = itemsToSpawn.poll();
+            if (itemDef.type == Mushroom.class) {
+                items.add(new Mushroom(this, itemDef.position.x, itemDef.position.y));
+            }
+        }
     }
 
     public TiledMap getMap() {
@@ -113,6 +138,9 @@ public class PlayScreen implements Screen {
         for (Enemy enemy : creator.getGoombas()) {
             enemy.draw(game.batch);
         }
+        for (Item item : items) {
+            item.draw(game.batch);
+        }
         game.batch.end();
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
@@ -122,6 +150,7 @@ public class PlayScreen implements Screen {
 
     public void update(float dt) {
         handleInput(dt);
+        handleSpawningItems();
 
         world.step(1/60f, 6, 2);
 
@@ -132,6 +161,11 @@ public class PlayScreen implements Screen {
                 enemy.b2Body.setActive(true);
             }
         }
+
+        for (Item item : items) {
+            item.update(dt);
+        }
+
         hud.update(dt);
 
         gameCam.position.x = player.b2Body.getPosition().x;

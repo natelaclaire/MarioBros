@@ -62,7 +62,7 @@ public class Goomba extends Enemy {
 
         FixtureDef fixtureDef = new FixtureDef();
         CircleShape shape = new CircleShape();
-        shape.setRadius(6/MarioBros.PPM);
+        shape.setRadius(6 / MarioBros.PPM);
 
         fixtureDef.filter.categoryBits = MarioBros.ENEMY_BIT;
         fixtureDef.filter.maskBits = MarioBros.GROUND_BIT |
