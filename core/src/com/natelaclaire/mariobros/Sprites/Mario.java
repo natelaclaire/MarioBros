@@ -26,7 +26,7 @@ public class Mario extends Sprite {
     private float stateTimer;
     private boolean runningRight;
 
-    public Mario(World world, PlayScreen screen) {
+    public Mario(PlayScreen screen) {
         super(screen.getAtlas().findRegion("little_mario"));
 
         currentState = State.STANDING;
@@ -47,7 +47,7 @@ public class Mario extends Sprite {
         marioJump = new Animation<TextureRegion>(0.1f, frames);
         frames.clear();
 
-        this.world = world;
+        this.world = screen.getWorld();
 
         marioStand = new TextureRegion(getTexture(), 0, 0, 16, 16);
 
@@ -119,7 +119,7 @@ public class Mario extends Sprite {
         shape.setRadius(6/MarioBros.PPM);
 
         fixtureDef.filter.categoryBits = MarioBros.MARIO_BIT;
-        fixtureDef.filter.maskBits = MarioBros.DEFAULT_BIT | MarioBros.COIN_BIT | MarioBros.BRICK_BIT;
+        fixtureDef.filter.maskBits = MarioBros.GROUND_BIT | MarioBros.COIN_BIT | MarioBros.BRICK_BIT | MarioBros.ENEMY_BIT | MarioBros.OBJECT_BIT;
 
         fixtureDef.shape = shape;
         b2Body.createFixture(fixtureDef);

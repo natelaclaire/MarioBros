@@ -7,11 +7,12 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.World;
 import com.natelaclaire.mariobros.MarioBros;
 import com.natelaclaire.mariobros.Scenes.Hud;
+import com.natelaclaire.mariobros.Screens.PlayScreen;
 
 public class Brick extends InteractiveTileObject {
 
-    public Brick(World world, TiledMap map, Rectangle bounds) {
-        super(world, map, bounds);
+    public Brick(PlayScreen screen, Rectangle bounds) {
+        super(screen, bounds);
         fixture.setUserData(this);
         setCategoryFilter(MarioBros.BRICK_BIT);
     }
