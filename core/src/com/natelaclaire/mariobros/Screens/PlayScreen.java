@@ -27,6 +27,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.natelaclaire.mariobros.MarioBros;
 import com.natelaclaire.mariobros.Scenes.Hud;
+import com.natelaclaire.mariobros.Sprites.Enemy;
 import com.natelaclaire.mariobros.Sprites.Goomba;
 import com.natelaclaire.mariobros.Sprites.Mario;
 import com.natelaclaire.mariobros.Tools.B2WorldCreator;
@@ -47,9 +48,9 @@ public class PlayScreen implements Screen {
     private Box2DDebugRenderer b2dr;
 
     private Mario player;
-    private Goomba goomba;
 
     private Music music;
+    private B2WorldCreator creator;
 
     public PlayScreen(MarioBros game) {
         atlas = new TextureAtlas("Mario_and_Enemies.pack");
@@ -67,7 +68,7 @@ public class PlayScreen implements Screen {
         world = new World(new Vector2(0, -10), true);
         b2dr = new Box2DDebugRenderer();
 
-        new B2WorldCreator(this);
+        creator= new B2WorldCreator(this);
 
         player = new Mario(this);
 
@@ -76,8 +77,6 @@ public class PlayScreen implements Screen {
         music = MarioBros.manager.get("audio/music/mario_music.ogg", Music.class);
         music.setLooping(true);
         music.play();
-
-        goomba = new Goomba(this, 0.64f, 0.32f);
     }
 
     public TiledMap getMap() {
@@ -111,7 +110,9 @@ public class PlayScreen implements Screen {
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
         player.draw(game.batch);
-        goomba.draw(game.batch);
+        for (Enemy enemy : creator.getGoombas()) {
+            enemy.draw(game.batch);
+        }
         game.batch.end();
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
@@ -125,7 +126,12 @@ public class PlayScreen implements Screen {
         world.step(1/60f, 6, 2);
 
         player.update(dt);
-        goomba.update(dt);
+        for (Enemy enemy : creator.getGoombas()) {
+            enemy.update(dt);
+            if (enemy.getX() < player.getX() + 224/MarioBros.PPM) {
+                enemy.b2Body.setActive(true);
+            }
+        }
         hud.update(dt);
 
         gameCam.position.x = player.b2Body.getPosition().x;

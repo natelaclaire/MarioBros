@@ -1,6 +1,7 @@
 package com.natelaclaire.mariobros.Sprites;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -37,10 +38,18 @@ public class Goomba extends Enemy {
             world.destroyBody(b2Body);
             destroyed = true;
             setRegion(new TextureRegion(screen.getAtlas().findRegion("goomba"), 32, 0, 16, 16));
+            stateTime = 0;
         }
         else if (!destroyed) {
+            b2Body.setLinearVelocity(velocity);
             setPosition(b2Body.getPosition().x - getWidth() / 2, b2Body.getPosition().y - getHeight() / 2);
             setRegion(walkAnimation.getKeyFrame(stateTime, true));
+        }
+    }
+
+    public void draw(Batch batch) {
+        if (!destroyed || stateTime < 1) {
+            super.draw(batch);
         }
     }
 
@@ -64,7 +73,7 @@ public class Goomba extends Enemy {
                 MarioBros.MARIO_BIT;
 
         fixtureDef.shape = shape;
-        b2Body.createFixture(fixtureDef);
+        b2Body.createFixture(fixtureDef).setUserData(this);
 
         PolygonShape head = new PolygonShape();
         Vector2[] vertice = new Vector2[4];
