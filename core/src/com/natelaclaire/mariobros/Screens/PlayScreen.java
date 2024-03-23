@@ -28,6 +28,7 @@ import com.natelaclaire.mariobros.MarioBros;
 import com.natelaclaire.mariobros.Scenes.Hud;
 import com.natelaclaire.mariobros.Sprites.Mario;
 import com.natelaclaire.mariobros.Tools.B2WorldCreator;
+import com.natelaclaire.mariobros.Tools.WorldContactListener;
 
 public class PlayScreen implements Screen {
     private MarioBros game;
@@ -64,6 +65,8 @@ public class PlayScreen implements Screen {
         new B2WorldCreator(world, map);
 
         player = new Mario(world, this);
+
+        world.setContactListener(new WorldContactListener());
     }
     @Override
     public void show() {
