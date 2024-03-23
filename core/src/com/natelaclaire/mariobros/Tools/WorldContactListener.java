@@ -6,9 +6,11 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
+import com.natelaclaire.mariobros.Items.Item;
 import com.natelaclaire.mariobros.MarioBros;
 import com.natelaclaire.mariobros.Sprites.Enemy;
 import com.natelaclaire.mariobros.Sprites.InteractiveTileObject;
+import com.natelaclaire.mariobros.Sprites.Mario;
 
 public class WorldContactListener implements ContactListener {
     @Override
@@ -47,9 +49,25 @@ public class WorldContactListener implements ContactListener {
             case MarioBros.MARIO_BIT | MarioBros.ENEMY_BIT:
                 Gdx.app.log("MARIO", "Died");
                 break;
-            case MarioBros.ENEMY_BIT | MarioBros.ENEMY_BIT:
+            case MarioBros.ENEMY_BIT:
                 ((Enemy)fixA.getUserData()).reverseVelocity(true, false);
                 ((Enemy)fixB.getUserData()).reverseVelocity(true, false);
+                break;
+            case MarioBros.ITEM_BIT | MarioBros.OBJECT_BIT:
+                if (fixA.getFilterData().categoryBits == MarioBros.ITEM_BIT) {
+                    ((Item)fixA.getUserData()).reverseVelocity(true, false);
+                }
+                else {
+                    ((Item)fixB.getUserData()).reverseVelocity(true, false);
+                }
+                break;
+            case MarioBros.ITEM_BIT | MarioBros.MARIO_BIT:
+                if (fixA.getFilterData().categoryBits == MarioBros.ITEM_BIT) {
+                    ((Item)fixA.getUserData()).use((Mario) fixB.getUserData());
+                }
+                else {
+                    ((Item)fixB.getUserData()).use((Mario) fixA.getUserData());
+                }
                 break;
         }
     }
