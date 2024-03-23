@@ -77,7 +77,7 @@ public class PlayScreen implements Screen {
         music.setLooping(true);
         music.play();
 
-        goomba = new Goomba(this, 0.32f, 0.32f);
+        goomba = new Goomba(this, 0.64f, 0.32f);
     }
 
     public TiledMap getMap() {
