@@ -14,23 +14,35 @@ import com.natelaclaire.mariobros.MarioBros;
 import com.natelaclaire.mariobros.Scenes.Hud;
 import com.natelaclaire.mariobros.Screens.PlayScreen;
 
+import java.util.Random;
+
 public class Coin extends InteractiveTileObject {
     private static TiledMapTileSet tileSet;
     private final int BLANK_COIN = 28;
+    private boolean blankCoin;
+    private boolean spawnsMushroom;
+    private Random random;
+
+    public boolean getRandomBoolean(float p){
+        return random.nextFloat() < p;
+    }
 
     public Coin(PlayScreen screen, MapObject object) {
         super(screen, object);
         tileSet = map.getTileSets().getTileSet("tileset_gutter");
         fixture.setUserData(this);
         setCategoryFilter(MarioBros.COIN_BIT);
+        random = new Random();
+        blankCoin = getRandomBoolean(0.8f);
+        spawnsMushroom = getRandomBoolean(0.6f);
     }
 
     @Override
     public void onHeadHit(Mario mario) {
-        if (getCell().getTile().getId() == BLANK_COIN) {
+        if (blankCoin) {
             MarioBros.manager.get("audio/sounds/bump.wav", Sound.class).play();
         } else {
-            if (object.getProperties().containsKey("mushroom")) {
+            if (spawnsMushroom) {
                 screen.spawnItem(
                         new ItemDef(
                                 new Vector2(
@@ -44,10 +56,9 @@ public class Coin extends InteractiveTileObject {
             } else {
                 MarioBros.manager.get("audio/sounds/coin.wav", Sound.class).play();
             }
-
+            Hud.addScore(100);
         }
         getCell().setTile(tileSet.getTile(BLANK_COIN));
-        Hud.addScore(100);
 
     }
 }
