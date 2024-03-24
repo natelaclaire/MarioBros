@@ -146,6 +146,11 @@ public class PlayScreen implements Screen {
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
 
+        if (isGameOver()) {
+            game.setScreen(new GameOverScreen(game));
+            dispose();
+        }
+
     }
 
     public void update(float dt) {
@@ -176,6 +181,13 @@ public class PlayScreen implements Screen {
         renderer.setView(gameCam);
     }
 
+    public boolean isGameOver() {
+        if (player.currentState == Mario.State.DEAD && player.getStateTimer() > 3) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     private void handleInput(float dt) {
         if (player.currentState != Mario.State.DEAD) {
             if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
